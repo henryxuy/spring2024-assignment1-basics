@@ -8,11 +8,27 @@ raise a GitHub issue or open a pull request with a fix.
 
 ## Setup
 
-0. Set up a conda environment and install packages:
+0. Set up a virtual environment and install packages:
 
+**Option A: Using conda (recommended):**
 ``` sh
 conda create -n cs336_basics python=3.10 --yes
 conda activate cs336_basics
+pip install -e .'[test]'
+```
+
+**Option B: Using Python's built-in venv (without conda):**
+``` sh
+# Create virtual environment
+python -m venv cs336_basics
+
+# Activate virtual environment
+# On macOS/Linux:
+source cs336_basics/bin/activate
+# On Windows:
+# cs336_basics\Scripts\activate
+
+# Install packages
 pip install -e .'[test]'
 ```
 

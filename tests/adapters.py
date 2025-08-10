@@ -6,7 +6,10 @@ from typing import IO, BinaryIO, Iterable, Optional, Type
 
 import numpy.typing as npt
 import torch
-
+from cs336_bpe.bpe_encoder import get_tokenizer_implemented, run_train_bpe_implemented
+from cs336_torch.rmsnorm import RMSNormImplemented
+from cs336_torch.positionwise_feedforward import gelu_implemented, PositionwiseFeedforwardImplemented
+from cs336_torch.softmax_own import softmax_implemented
 
 def run_positionwise_feedforward(
     d_model: int,
@@ -43,7 +46,8 @@ def run_positionwise_feedforward(
     # You can also manually assign the weights
     # my_ffn.w1.weight.data = weights["w1.weight"]
     # my_ffn.w2.weight.data = weights["w2.weight"]
-    raise NotImplementedError
+    ffn = PositionwiseFeedforwardImplemented(d_model, d_ff, weights)
+    return ffn(in_features)
 
 
 def run_scaled_dot_product_attention(
@@ -331,7 +335,8 @@ def run_rmsnorm(
         FloatTensor of with the same shape as `in_features` with the output of running
         RMSNorm of the `in_features`.
     """
-    raise NotImplementedError
+    rmsnorm = RMSNormImplemented(d_model, weights, eps)
+    return rmsnorm(in_features)
 
 
 def run_gelu(in_features: torch.FloatTensor) -> torch.FloatTensor:
@@ -346,7 +351,7 @@ def run_gelu(in_features: torch.FloatTensor) -> torch.FloatTensor:
         FloatTensor of with the same shape as `in_features` with the output of applying
         GELU to each element.
     """
-    raise NotImplementedError
+    return gelu_implemented(in_features)
 
 
 def run_get_batch(
@@ -390,7 +395,7 @@ def run_softmax(in_features: torch.FloatTensor, dim: int) -> torch.FloatTensor:
         FloatTensor of with the same shape as `in_features` with the output of
         softmax normalizing the specified `dim`.
     """
-    raise NotImplementedError
+    return softmax_implemented(in_features, dim)
 
 
 def run_cross_entropy(inputs: torch.FloatTensor, targets: torch.LongTensor):
@@ -536,7 +541,7 @@ def get_tokenizer(
     Returns:
         A BPE tokenizer that uses the provided vocab, merges, and special tokens.
     """
-    raise NotImplementedError
+    return get_tokenizer_implemented(vocab, merges, special_tokens)
 
 
 def run_train_bpe(
@@ -569,4 +574,4 @@ def run_train_bpe(
                 representing that <token1> was merged with <token2>.
                 Merges are ordered by order of creation.
     """
-    raise NotImplementedError
+    return run_train_bpe_implemented(input_path, vocab_size, special_tokens)

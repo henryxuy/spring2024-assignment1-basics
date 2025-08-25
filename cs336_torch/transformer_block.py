@@ -226,10 +226,11 @@ def transformer_lm_implemented(
         FloatTensor of shape (batch size, sequence_length, vocab_size) with the predicted unnormalized
         next-word distribution for each token.
     """
-    token_embeddings = weights['token_embeddings.weight']
-    position_embeddings = weights['position_embeddings.weight']
+    token_embedding_layer = torch.nn.Embedding(vocab_size, d_model)
+    token_embedding_layer.weight.data = weights['token_embeddings.weight']
 
-
+    position_embedding_layer = torch.nn.Embedding(context_length, d_model)
+    position_embedding_layer.weight.data = weights['position_embeddings.weight']
 
     
     ln_final_weights = {'weight': weights['ln_final.weight']}
@@ -237,11 +238,41 @@ def transformer_lm_implemented(
     lm_head = torch.nn.Linear(d_model, vocab_size, bias=False)
     lm_head.weight.data = weights['lm_head.weight']
     
+    # in_indices is (batch_size, sequence_length)
+    # x_after_token_embeddings, x_after_position_embeddings is (batch_size, sequence_length, d_model)
+    # x_after_token_and_position_embeddings is (batch_size, sequence_length, d_model)
+    batch_size, sequence_length = in_indices.shape
+    position_indices = torch.arange(sequence_length, device=in_indices.device)
+    position_indices = position_indices.unsqueeze(0).expand(batch_size, sequence_length)
 
+    x_after_token_embeddings = token_embedding_layer(in_indices)
+    x_after_position_embeddings = position_embedding_layer(position_indices)  # (batch_size, seq_len, d_model)
+    x_after_token_and_position_embeddings = x_after_token_embeddings + x_after_position_embeddings
+    dropout_layer = torch.nn.Dropout(residual_pdrop)
+    # dropout_layer.eval()  # Disable dropout
+    x_after_token_and_position_embeddings = dropout_layer(x_after_token_and_position_embeddings)
 
-
-
-
-    pass
-
-
+    for i in range(num_layers):
+        weights_layer_i = {
+            'attn.q_proj.weight': weights[f'layers.{i}.attn.q_proj.weight'],
+            'attn.k_proj.weight': weights[f'layers.{i}.attn.k_proj.weight'],
+            'attn.v_proj.weight': weights[f'layers.{i}.attn.v_proj.weight'],
+            'attn.output_proj.weight': weights[f'layers.{i}.attn.output_proj.weight'],
+            'ln1.weight': weights[f'layers.{i}.ln1.weight'],
+            'ffn.w1.weight': weights[f'layers.{i}.ffn.w1.weight'],
+            'ffn.w2.weight': weights[f'layers.{i}.ffn.w2.weight'],
+            'ln2.weight': weights[f'layers.{i}.ln2.weight']
+        }
+        x_after_token_and_position_embeddings = transformer_block_implemented(
+            d_model, 
+            num_heads, 
+            d_ff, 
+            attn_pdrop, 
+            residual_pdrop, 
+            weights_layer_i, 
+            x_after_token_and_position_embeddings
+        )
+    
+    x_after_transformer_blocks = ln_final(x_after_token_and_position_embeddings)
+    output = lm_head(x_after_transformer_blocks)
+    return output

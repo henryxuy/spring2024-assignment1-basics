@@ -12,7 +12,7 @@ from cs336_torch.positionwise_feedforward import gelu_implemented, PositionwiseF
 from cs336_torch.softmax_own import softmax_implemented
 from cs336_torch.scaled_dot_product_attention import scaled_dot_product_attention_implemented
 from cs336_torch.casual_multi_head_self_attention import multihead_self_attention_implemented
-from cs336_torch.transformer_block import transformer_block_implemented
+from cs336_torch.transformer_block import transformer_block_implemented, transformer_lm_implemented
 
 def run_positionwise_feedforward(
     d_model: int,
@@ -308,7 +308,10 @@ def run_transformer_lm(
         FloatTensor of shape (batch size, sequence_length, vocab_size) with the predicted unnormalized
         next-word distribution for each token.
     """
-    raise NotImplementedError
+    return transformer_lm_implemented(
+        vocab_size, context_length, d_model, num_layers, num_heads, d_ff, 
+        attn_pdrop, residual_pdrop, weights, in_indices
+    )
 
 
 def run_rmsnorm(

@@ -10,6 +10,9 @@ from cs336_bpe.bpe_encoder import get_tokenizer_implemented, run_train_bpe_imple
 from cs336_torch.rmsnorm import RMSNormImplemented
 from cs336_torch.positionwise_feedforward import gelu_implemented, PositionwiseFeedforwardImplemented
 from cs336_torch.softmax_own import softmax_implemented
+from cs336_torch.scaled_dot_product_attention import scaled_dot_product_attention_implemented
+from cs336_torch.casual_multi_head_self_attention import multihead_self_attention_implemented
+from cs336_torch.transformer_block import transformer_block_implemented
 
 def run_positionwise_feedforward(
     d_model: int,
@@ -89,7 +92,7 @@ def run_scaled_dot_product_attention(
         with the output of running your scaled dot product attention
         implementation with the provided key, query, and value tensors.
     """
-    raise NotImplementedError
+    return scaled_dot_product_attention_implemented(K, Q, V, mask, pdrop)
 
 
 def run_multihead_self_attention(
@@ -139,7 +142,7 @@ def run_multihead_self_attention(
         torch.FloatTensor with the output of running your optimized, batched multi-headed attention
         implementation with the given QKV projection weights and input features.
     """
-    raise NotImplementedError
+    return multihead_self_attention_implemented(d_model, num_heads, attn_pdrop, weights, in_features)
 
 
 def run_transformer_block(
@@ -211,7 +214,8 @@ def run_transformer_block(
         FloatTensor of shape (batch_size, sequence_length, d_model) with the output of
         running the Transformer block on the input features.
     """
-    raise NotImplementedError
+    
+    return transformer_block_implemented(d_model, num_heads, d_ff, attn_pdrop, residual_pdrop, weights, in_features)
 
 
 def run_transformer_lm(

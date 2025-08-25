@@ -38,3 +38,5 @@ class PositionwiseFeedforwardImplemented(torch.nn.Module):
 
     def forward(self, in_features: torch.FloatTensor) -> torch.FloatTensor:
         return self.w2(gelu_implemented(self.w1(in_features)))
+
+

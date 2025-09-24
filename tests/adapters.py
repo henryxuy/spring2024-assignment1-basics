@@ -13,6 +13,10 @@ from cs336_torch.softmax_own import softmax_implemented
 from cs336_torch.scaled_dot_product_attention import scaled_dot_product_attention_implemented
 from cs336_torch.casual_multi_head_self_attention import multihead_self_attention_implemented
 from cs336_torch.transformer_block import transformer_block_implemented, transformer_lm_implemented
+from cs336_torch.cross_entropy import cross_entropy_implemented
+from cs336_torch.adamw import AdamWImplemented
+from cs336_torch.lr_cosine_schedule import get_lr_cosine_schedule
+from cs336_torch.gradient_clipping import run_gradient_clipping_implemented
 
 def run_positionwise_feedforward(
     d_model: int,
@@ -420,7 +424,7 @@ def run_cross_entropy(inputs: torch.FloatTensor, targets: torch.LongTensor):
     Returns:
         Tensor of shape () with the average cross-entropy loss across examples.
     """
-    raise NotImplementedError
+    return cross_entropy_implemented(inputs, targets)
 
 
 def run_gradient_clipping(parameters: Iterable[torch.nn.Parameter], max_l2_norm: float):
@@ -435,14 +439,14 @@ def run_gradient_clipping(parameters: Iterable[torch.nn.Parameter], max_l2_norm:
     Returns:
         None
     """
-    raise NotImplementedError
+    return run_gradient_clipping_implemented(parameters, max_l2_norm)
 
 
 def get_adamw_cls() -> Type[torch.optim.Optimizer]:
     """
     Returns a torch.optim.Optimizer that implements AdamW.
     """
-    raise NotImplementedError
+    return AdamWImplemented
 
 
 def run_get_lr_cosine_schedule(
@@ -475,7 +479,7 @@ def run_get_lr_cosine_schedule(
     Returns:
         Learning rate at the given iteration under the specified schedule.
     """
-    raise NotImplementedError
+    return get_lr_cosine_schedule(it, max_learning_rate, min_learning_rate, warmup_iters, cosine_cycle_iters)
 
 
 def run_save_checkpoint(
